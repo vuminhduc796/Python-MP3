@@ -31,7 +31,7 @@ class main(object):
         self.speed_widget.grid(row = 2,column = 1, columnspan = 2, sticky = N)
 
         self.midFrame = Frame(master, bg="#edc0c3", width=400, height=350).grid(column=0, row=3, columnspan=3 , rowspan=len(self.song_list),pady = 20)
-        self.name_label = Label(master, text="Song List",bg="#edc0c3", font=("Bernard MT Condensed", 17, "bold")).grid(row=3, column=0,
+        self.name_label = Label(master, text="Song List",bg="#edc0c3", font=("Bernard MT Condensed", 17)).grid(row=3, column=0,
                                                                                                   columnspan = 3,sticky = N,pady = 20)
 
         self.icon_back = PhotoImage(file="back.png").subsample(15,15)
@@ -49,11 +49,15 @@ class main(object):
         self.update_songlist()
 
     def update_songlist(self):
+        update_call = lambda x: (lambda p: self.change_song(x))
         for song_index in range(len(self.song_list)):
             song_label = Label(self.midFrame, text=self.song_list[song_index], fg="#381310", bg="#edc0c3", font=("Comic Sans MS", 12))
             song_label.grid(row=3 + song_index, column = 0, columnspan = 3,sticky = W,padx = 20)
+            song_label.bind("<Button-1>", update_call(self.song_list[song_index]))
 
-
+    def change_song(self,song):
+        self.current_song = song
+        self.play(5000)
     def change_speed(self,value):
         self.speed = int(value)
 
