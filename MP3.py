@@ -9,6 +9,7 @@ class main(object):
     def __init__(self,master):
         self.master = master
         pygame.init()
+        pygame.mixer.music.set_volume(0.5)
         os.chdir("./music")
         self.song_list = glob.glob("*.mp3")
         os.chdir("../icon")
@@ -29,27 +30,36 @@ class main(object):
         self.speed = self.volume_widget.get()
         self.speed_widget.grid(row = 2,column = 1, columnspan = 2, sticky = N)
 
+        self.midFrame = Frame(master, bg="#edc0c3", width=400, height=350).grid(column=0, row=3, columnspan=3 , rowspan=len(self.song_list),pady = 20)
+        self.name_label = Label(master, text="Song List",bg="#edc0c3", font=("Bernard MT Condensed", 17, "bold")).grid(row=3, column=0,
+                                                                                                  columnspan = 3,sticky = N,pady = 20)
+
         self.icon_back = PhotoImage(file="back.png").subsample(15,15)
         self.icon_next = PhotoImage(file="next.png").subsample(15,15)
         self.icon_pause = PhotoImage(file="pause.png").subsample(15,15)
         self.icon_resume = PhotoImage(file = "resume.png").subsample(15,15)
 
         self.back_button = tk.Button(player, width=50, height=50, image=self.icon_back, command=self.back)
-        self.back_button.grid(row = 10, column = 0,sticky = E)
+        self.back_button.grid(row = 10, column = 0,sticky = S + E)
         self.resume_button = tk.Button(player, width=50, height=50, image = self.icon_resume, command=self.resume)
         self.resume_button.grid(row = 10, column = 1)
         self.next_button = tk.Button(player, width=50, height=50, image = self.icon_next, command=self.next)
-        self.next_button.grid(row = 10, column = 2, sticky = W)
+        self.next_button.grid(row = 10, column = 2, sticky = S + W)
         os.chdir("../music")
+        self.update_songlist()
+
+    def update_songlist(self):
+        for song_index in range(len(self.song_list)):
+            song_label = Label(self.midFrame, text=self.song_list[song_index], fg="#381310", bg="#edc0c3", font=("Comic Sans MS", 12))
+            song_label.grid(row=3 + song_index, column = 0, columnspan = 3,sticky = W,padx = 20)
+
 
     def change_speed(self,value):
-        return
+        self.speed = int(value)
+
 
     def change_volume(self,value):
-        current_vol = pygame.mixer.music.get_volume()
-        
-        print(current_vol)
-        pygame.mixer.music.set_volume(current_vol*int(value)/50)
+        pygame.mixer.music.set_volume(0.5*int(value)/50)
 
     def resume(self):
         if self.playing is True:
@@ -61,7 +71,8 @@ class main(object):
     def play(self, speed):
         self.playing = True
         mp3 = mutagen.mp3.MP3(self.current_song)
-        pygame.mixer.init(frequency=speed)
+        pygame.mixer.init(frequency=50000)
+
         pygame.mixer_music.load(self.current_song)
         pygame.mixer_music.play()
         self.resume_button["image"] = self.icon_pause
@@ -79,7 +90,7 @@ class main(object):
             self.current_song = self.song_list[0]
         else:
             self.current_song = self.song_list[temp_index+1]
-        self.play()
+        self.play(int(50000 * int(self.speed)/ 50))
 
     def back(self):
         temp_index = self.song_list.index(self.current_song)
@@ -87,7 +98,7 @@ class main(object):
             self.current_song = self.song_list[len(self.song_list) - 1]
         else:
             self.current_song = self.song_list[temp_index - 1]
-        self.play()
+        self.play(int(50000 * int(self.speed)/ 50))
 
 if __name__ == "__main__":
     player = tk.Tk()
